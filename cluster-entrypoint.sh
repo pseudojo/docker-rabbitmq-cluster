@@ -7,9 +7,18 @@ set -e
 # will be honored
 /usr/local/bin/docker-entrypoint.sh rabbitmq-server -detached
 
+# Setup plug-in (mqtt, stomp, federation_management)
+rabbitmq-plugins enable --offline rabbitmq_mqtt \
+                                  rabbitmq_stomp \
+                                  rabbitmq_web_mqtt \
+                                  rabbitmq_web_stomp \
+                                  rabbitmq_federation_management
+# Wait a waile
+sleep 0.1s
+
 # Do the cluster dance
 rabbitmqctl stop_app
-rabbitmqctl join_cluster rabbit@rabbitmq1
+rabbitmqctl join_cluster rabbit@rabbitmq-main
 
 # Stop the entire RMQ server. This is done so that we
 # can attach to it again, but without the -detached flag
@@ -21,3 +30,4 @@ sleep 2s
 
 # Start it
 rabbitmq-server
+
