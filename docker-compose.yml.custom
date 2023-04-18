@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+
+  rabbitmq-main:
+    deploy:
+      replicas: 1
+    image: rabbitmq:3.11.13-management-alpine
+    networks:
+      - rabbitmq_cluster_network
+    hostname: rabbitmq-main
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=${RABBITMQ_ERLANG_COOKIE}
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST}
+
+  rabbitmq-node:
+    deploy:
+      replicas: 1
+    image: rabbitmq:3.11.13-management-alpine
+    networks:
+      - rabbitmq_cluster_network
+    hostname: rabbitmq-node
+    depends_on:
+      - rabbitmq-main
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=${RABBITMQ_ERLANG_COOKIE}
+    volumes:
+      - ./cluster-entrypoint.sh:/usr/local/bin/cluster-entrypoint.sh:rox
+    entrypoint: /usr/local/bin/cluster-entrypoint.sh
+
+  haproxy:
+    deploy:
+      replicas: 1
+    image: haproxy:2.7.6-alpine3.17
+    networks:
+      - rabbitmq_cluster_network
+    restart: always
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - rabbitmq-main
+      - rabbitmq-node
+    ports:
+      - 15672:15672
+      - 5672:5672
+      - 1883:1883
+      - 61613:61613
+      - 15674:15674
+      - 15675:15675
+
+networks:
+  rabbitmq_cluster_network:
+    driver: bridge
+
