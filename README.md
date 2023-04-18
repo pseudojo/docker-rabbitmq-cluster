@@ -22,9 +22,7 @@ For information on how to achieve [clustering](https://www.rabbitmq.com/clusteri
   - `rabbitmq_management_agent`
   - `rabbitmq_peer_discovery_consul`
   - `rabbitmq_tracing`
-  - `rabbitmq_mqtt`
   - `rabbitmq_web_mqtt`
-  - `rabbitmq_stomp`
   - `rabbitmq_web_stomp`
 
 * Increase RabbitMQ containers : 3 -> 7
