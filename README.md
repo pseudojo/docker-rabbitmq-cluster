@@ -18,6 +18,15 @@ For information on how to achieve [clustering](https://www.rabbitmq.com/clusteri
   - Update latest image tag of RabbitMQ: `3-management` to `3.11.13-management-alpine`
   - Update latest image tag of HA Proxy: `1.7` to `2.7.6-alpine3.17`
 
+* Add some plugins for RabbitMQ
+  - `rabbitmq_management_agent`
+  - `rabbitmq_peer_discovery_consul`
+  - `rabbitmq_tracing`
+  - `rabbitmq_mqtt`
+  - `rabbitmq_web_mqtt`
+  - `rabbitmq_stomp`
+  - `rabbitmq_web_stomp`
+
 * Increase RabbitMQ containers : 3 -> 7
   - Rename rabbitmq1 to rabbitmq-main and deploy 3 container as scalable.
   - Rename/Remove rabbitmq2 to rabbitmq-node and deploy 4 container as scalable.
