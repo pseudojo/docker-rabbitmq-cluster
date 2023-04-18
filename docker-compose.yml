@@ -1,0 +1,72 @@
+version: "3"
+services:
+  # consul : use bitnami/consul image instead of hashicorp/consul
+  consul:
+    image: bitnami/consul:1-debian-11
+    restart: always
+    volumes:
+     - ./consul.json:/opt/bitnami/consul/consul.json:ro
+    ports:
+      - "8300:8300"
+      - "8301:8301"
+      - "8301:8301/udp"
+      - "8500:8500"
+      - "8600:8600/tcp"
+      - "8600:8600/udp"
+    networks:
+      - rabbitmq_cluster_network
+      
+  # lb : depends on rabbit 
+  lb:
+    #image: dockercloud/haproxy
+    image: haproxy:lts-alpine
+    restart: always
+    environment:
+      - MODE="tcp"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+      - "1883:1883"
+      - "61613:61613"
+      - "15674:15674"
+      - "15675:15675"
+    links:
+      - rabbit
+    networks:
+      - rabbitmq_cluster_network
+    depends_on:
+      - consul
+
+  # rabbit : depends on consul (peer discovery)
+  rabbit:
+    #image: rabbitmq:3.7
+    image: rabbitmq:3-management-alpine
+    restart: always
+    environment:
+      - RABBITMQ_ERLANG_COOKIE="${RABBITMQ_ERLANG_COOKIE}"
+      - RABBITMQ_DEFAULT_USER="${RABBITMQ_DEFAULT_USER}"
+      - RABBITMQ_DEFAULT_PASS="${RABBITMQ_DEFAULT_PASS}"
+      - RABBITMQ_DEFAULT_VHOST="${RABBITMQ_DEFAULT_VHOST}"
+    deploy:
+      replicas: 1
+    volumes:
+      - ./conf/:/etc/rabbitmq/
+    expose:
+      - 15672
+      - 5672
+      - 5671
+      - 15671
+    command: /bin/sh -c "sleep 10; rabbitmq-server;"
+    tty: true
+    networks:
+      - rabbitmq_cluster_network
+    depends_on:
+      - consul
+
+networks:
+  rabbitmq_cluster_network:
+    driver: bridge
+
