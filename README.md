@@ -7,6 +7,7 @@ The main benifit with this approach is that you can use [any version](https://hu
 For information on how to achieve [clustering](https://www.rabbitmq.com/clustering.html) using peer discovery, refer to the rabbitmq official website.
   - [Cluster Formation and Peer Discovery](https://www.rabbitmq.com/cluster-formation.html)
   - [RabbitMQ Docker-compose Sample: Peer Discovery with Consul](https://github.com/rabbitmq/rabbitmq-server/tree/main/deps/rabbitmq_peer_discovery_consul/examples/compose_consul_haproxy)
+  - [Deploy a Consul datacenter(1 server and 1 client)](https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy)
 
 ## Changelog after forked (at 2023/04/10)
 
@@ -15,8 +16,9 @@ For information on how to achieve [clustering](https://www.rabbitmq.com/clusteri
   - Apply useful setting to rabbitmq.conf, from "peer discovery with consul sample"
 
 * Change container image tag to specific version
-  - Update latest image tag of RabbitMQ: `3-management` to `3.11.13-management-alpine`
-  - Update latest image tag of HA Proxy: `1.7` to `2.7.6-alpine3.17`
+  - Update image tag of RabbitMQ: `3-management` to `3-management-alpine`
+  - Update image tag of HAProxy: `1.7` to `lts-alpine`
+  - Add image tag of Consul: `latest` to `1-debian-11`
 
 * Add some plugins for RabbitMQ
   - `rabbitmq_management_agent`
@@ -25,14 +27,9 @@ For information on how to achieve [clustering](https://www.rabbitmq.com/clusteri
   - `rabbitmq_web_mqtt`
   - `rabbitmq_web_stomp`
 
-* Increase RabbitMQ containers : 3 -> 7
-  - Rename rabbitmq1 to rabbitmq-main and deploy 3 container as scalable.
-  - Rename/Remove rabbitmq2 to rabbitmq-node and deploy 4 container as scalable.
-  - Change `depends_on` containers; 
-    - rabbitmq-main >> rabbitmq-node
-    - (rabbitmq-main, rabbitmq-node) >> haproxy
+* Add `depends_on` of containers; `Consul(consul) >> HAProxy(lb),RabbitMQ(rabbit)`
 
-* Add `always` restart policy for HA Proxy.
+* Add `always` restart policy for all containers.
 
 * Add container-shared network as `bridge mode`: `rabbitmq_cluster_network`
 
@@ -48,6 +45,11 @@ For information on how to achieve [clustering](https://www.rabbitmq.com/clusteri
 > 
 > # Start long-options with daemon
 > docker-compose --env-file ./.env --file ./docker-compose.yml up -d
+>
+> # How to scale-up RabbitMQ : --scale rabbit=<NUMBER>
+> docker-compose up -d --scale rabbit=7
+> # ... or 
+> docker-compose --env-file ./.env --file ./docker-compose.yml up -d --scale rabbit=7
 ```
 
 Most things will be how you expect:
@@ -90,7 +92,7 @@ It should be fairly easy to add a [`port mapping`](https://docs.docker.com/compo
 > docker-compose down --timeout 3 --remove-orphans
 >
 > # Purge all
-> docker-compose down --rmi all --remove-orphans
+> docker-compose down --rmi all --remove-orphans --timeout 3
 ```
 
 ## Read more
