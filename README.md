@@ -41,15 +41,15 @@ For information on how to achieve [clustering](https://www.rabbitmq.com/clusteri
 > cd docker-rabbitmq-cluster
 >
 > # Start development
-> docker-compose up
+> docker compose up
 > 
 > # Start long-options with daemon
-> docker-compose --env-file ./.env --file ./docker-compose.yml up -d
+> docker compose --env-file ./.env --file ./docker compose.yml up -d
 >
 > # How to scale-up RabbitMQ : --scale rabbit=<NUMBER>
-> docker-compose up -d --scale rabbit=7
+> docker compose up -d --scale rabbit=7
 > # ... or 
-> docker-compose --env-file ./.env --file ./docker-compose.yml up -d --scale rabbit=7
+> docker compose --env-file ./.env --file ./docker compose.yml up -d --scale rabbit=7
 ```
 
 Most things will be how you expect:
@@ -64,10 +64,10 @@ Most things will be how you expect:
 ## How to monitor/view for containers included RabbitMQ, HA Proxy that.
 ```
 > # check containers
-> docker-compose ps
+> docker compose ps
 >
 > # trailing logs with latest 100 lines for all containers
-> docker-compose logs --tail=100 -f
+> docker compose logs --tail=100 -f
 ```
 
 ## Customize
@@ -76,7 +76,7 @@ The `.env` file contains environment variables that can be used to change the de
 
 ## HA Proxy
 
-This `docker-compose.yml` file comes with the latest version of [HA Proxy](http://www.haproxy.org/), an open source software that provides a high availability load balancer and proxy server.
+This `docker compose.yml` file comes with the latest version of [HA Proxy](http://www.haproxy.org/), an open source software that provides a high availability load balancer and proxy server.
 
 It should be fairly easy to add a [`port mapping`](https://docs.docker.com/compose/compose-file/#ports) for the individual containers if it is desired to connect to a specific broker node.
 
@@ -86,13 +86,13 @@ It should be fairly easy to add a [`port mapping`](https://docs.docker.com/compo
 > cd docker-rabbitmq-cluster
 >
 > # Stop rabbitmq-cluster smoothly.
-> docker-compose down
+> docker compose down
 >
 > # Stop rabbitmq-cluster quickly. (3 seconds timeout)
-> docker-compose down --timeout 3 --remove-orphans
+> docker compose down --timeout 3 --remove-orphans
 >
 > # Purge all
-> docker-compose down --rmi all --remove-orphans --timeout 3
+> docker compose down --rmi all --remove-orphans --timeout 3
 ```
 
 ## Read more
