@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+_BASE="$( dirname -- "${BASH_SOURCE[0]}" )"
+. $_BASE/common.sh
+
 if [ "$#" -eq 0 ]; then
   _rabbit=1
 else
