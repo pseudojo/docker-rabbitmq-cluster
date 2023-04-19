@@ -13,5 +13,5 @@ else
   echo "Rabbit Scale: [ ${_rabbit} ]"
 fi
 
-docker compose --env-file ./.env --file ./docker compose.yml up -d --scale rabbit="${_rabbit}"
+docker compose --env-file ./.env up -d --scale rabbit="${_rabbit}"
 
