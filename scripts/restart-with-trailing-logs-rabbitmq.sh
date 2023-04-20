@@ -10,4 +10,7 @@ sleep 1
 
 bash $SCRIPT_HOME/scripts/start-rabbitmq.sh
 
+sleep 0.1
+
+bash $SCRIPT_HOME/scripts/trailing-logs-rabbitmq.sh
 

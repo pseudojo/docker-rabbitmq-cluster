@@ -7,7 +7,13 @@ The main benifit with this approach is that you can use [any version](https://hu
 For information on how to achieve [clustering](https://www.rabbitmq.com/clustering.html) using peer discovery, refer to the rabbitmq official website.
   - [Cluster Formation and Peer Discovery](https://www.rabbitmq.com/cluster-formation.html)
   - [RabbitMQ Docker-compose Sample: Peer Discovery with Consul](https://github.com/rabbitmq/rabbitmq-server/tree/main/deps/rabbitmq_peer_discovery_consul/examples/compose_consul_haproxy)
-  - [Deploy a Consul datacenter(1 server and 1 client)](https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy)
+  - Consul Deploy Sample
+    - [Deploy a Consul datacenter(1 server and 1 client)](https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy)
+    - [Consul configuration (hcl format)](https://github.com/hashicorp/learn-consul-docker/blob/main/datacenter-deploy-observability/consul/config.hcl)
+  - RabbitMQ Configuration Sample
+    - [rabbitmq.conf.example (Github)](https://github.com/rabbitmq/rabbitmq-server/blob/main/deps/rabbit/docs/rabbitmq.conf.example)
+    - [advanced.config.example (Github)](https://github.com/rabbitmq/rabbitmq-server/blob/main/deps/rabbit/docs/advanced.config.example)
+    - [set_rabbitmq_policy.sh.example (Github)](https://github.com/rabbitmq/rabbitmq-server/blob/main/deps/rabbit/docs/set_rabbitmq_policy.sh.example)
 
 ## Changelog after forked (at 2023/04/10)
 
@@ -27,11 +33,11 @@ For information on how to achieve [clustering](https://www.rabbitmq.com/clusteri
   - `rabbitmq_web_mqtt`
   - `rabbitmq_web_stomp`
 
-* Add `depends_on` of containers; `Consul(consul) >> HAProxy(lb),RabbitMQ(rabbit)`
+* Add `depends_on` of containers; `Consul(consul) >> HAProxy(haproxy) >> RabbitMQ(rabbit)`
 
 * Add `always` restart policy for all containers.
 
-* Add container-shared network as `bridge mode`: `rabbitmq_cluster_network`
+* Add container-shared network as `bridge mode`: `rabbitmq-network`
 
 ## Install
 
@@ -44,12 +50,12 @@ For information on how to achieve [clustering](https://www.rabbitmq.com/clusteri
 > docker compose up
 > 
 > # Start long-options with daemon
-> docker compose --env-file ./.env --file ./docker compose.yml up -d
+> docker compose --env-file ./.env --file ./docker-compose.yml up -d
 >
 > # How to scale-up RabbitMQ : --scale rabbit=<NUMBER>
 > docker compose up -d --scale rabbit=7
 > # ... or 
-> docker compose --env-file ./.env --file ./docker compose.yml up -d --scale rabbit=7
+> docker compose --env-file ./.env --file ./docker-compose.yml up -d --scale rabbit=7
 ```
 
 Most things will be how you expect:
@@ -61,7 +67,7 @@ Most things will be how you expect:
   - STOMP : `localhost:15672`
 * The Management interface is found at `localhost:15672`
 
-## How to monitor/view for containers included RabbitMQ, HA Proxy that.
+## How to monitor/view for containers included RabbitMQ, HAProxy that.
 ```
 > # check containers
 > docker compose ps
@@ -74,11 +80,13 @@ Most things will be how you expect:
 
 The `.env` file contains environment variables that can be used to change the default username, password and virtual host.
 
-## HA Proxy
+## HAProxy
 
-This `docker compose.yml` file comes with the latest version of [HA Proxy](http://www.haproxy.org/), an open source software that provides a high availability load balancer and proxy server.
+This `docker-compose.yml` file comes with the latest version of [HAProxy](http://www.haproxy.org/), an open source software that provides a high availability load balancer and proxy server.
 
 It should be fairly easy to add a [`port mapping`](https://docs.docker.com/compose/compose-file/#ports) for the individual containers if it is desired to connect to a specific broker node.
+
+For monitoring, Connect to HAProxy Statistics Page. URL is `localhost:1936`.
 
 ## Uninstall
 

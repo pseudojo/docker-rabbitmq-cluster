@@ -3,9 +3,17 @@ services:
   # consul : use bitnami/consul image instead of hashicorp/consul
   consul:
     image: bitnami/consul:1-debian-11
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        #reservations:
+        #  cpus: '0.2'
+        #  memory: 20M
     restart: always
     volumes:
-     - ./consul.json:/opt/bitnami/consul/consul.json:ro
+     - ./consul:/opt/bitnami/consul/conf:ro
     ports:
       - "8300:8300"
       - "8301:8301"
@@ -14,17 +22,25 @@ services:
       - "8600:8600/tcp"
       - "8600:8600/udp"
     networks:
-      - rabbitmq_cluster_network
+      - ${NETWORK_ID}
       
-  # lb : depends on rabbit 
-  lb:
+  # haproxy : depends on rabbit 
+  haproxy:
     #image: dockercloud/haproxy
     image: haproxy:lts-alpine
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        #reservations:
+        #  cpus: '0.2'
+        #  memory: 20M
     restart: always
     environment:
       - MODE="tcp"
     volumes:
-      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "15672:15672"
@@ -33,19 +49,29 @@ services:
       - "61613:61613"
       - "15674:15674"
       - "15675:15675"
+      # HAProxy Statistics Page
+      - "1936:1936"
     links:
       - rabbit
     networks:
-      - rabbitmq_cluster_network
+      - ${NETWORK_ID}
     depends_on:
       - consul
 
   # rabbit : depends on consul (peer discovery)
   rabbit:
-    # default replica is 1
     #deploy:
-    #  replicas: 1
     image: rabbitmq:3-management-alpine
+    deploy:
+      # default replica is 1
+      #replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+        #reservations:
+        #  cpus: '0.2'
+        #  memory: 20M
     restart: always
     environment:
       - RABBITMQ_ERLANG_COOKIE=${RABBITMQ_ERLANG_COOKIE}
@@ -54,7 +80,7 @@ services:
       - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST}
     # bind conf/rabbitmq.conf file, create dynamic volume
     volumes:
-      - ./conf/:/etc/rabbitmq/
+      - ./rabbit/:/etc/rabbitmq/
       - /var/lib/rabbitmq
     expose:
       - 15672
@@ -66,7 +92,7 @@ services:
     command: /bin/sh -c "sleep 10; rabbitmq-server;"
     tty: true
     networks:
-      - rabbitmq_cluster_network
+      - ${NETWORK_ID}
     depends_on:
       - consul
 
@@ -75,6 +101,7 @@ services:
 #    driver: local
 
 networks:
-  rabbitmq_cluster_network:
-    driver: bridge
+  rabbit-network:
+    name: ${NETWORK_ID}
+    driver: ${NETWORK_DRIVER}
 
