@@ -42,7 +42,9 @@ services:
 
   # rabbit : depends on consul (peer discovery)
   rabbit:
-    #image: rabbitmq:3.7
+    # default replica is 1
+    #deploy:
+    #  replicas: 1
     image: rabbitmq:3-management-alpine
     restart: always
     environment:
@@ -50,14 +52,16 @@ services:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
       - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST}
-    deploy:
-      replicas: 1
+    # bind conf/rabbitmq.conf file, create dynamic volume
     volumes:
       - ./conf/:/etc/rabbitmq/
+      - /var/lib/rabbitmq
     expose:
       - 15672
       - 5672
       - 5671
+      - 1883
+      - 8883
       - 15671
     command: /bin/sh -c "sleep 10; rabbitmq-server;"
     tty: true
@@ -65,6 +69,10 @@ services:
       - rabbitmq_cluster_network
     depends_on:
       - consul
+
+#volumes:
+#  rabbit_mnesia:
+#    driver: local
 
 networks:
   rabbitmq_cluster_network:
