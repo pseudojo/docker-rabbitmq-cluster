@@ -1,20 +1,34 @@
 {
-    "datacenter":"dc1",
-    "domain":"consul",
-    "data_dir":"/opt/bitnami/consul/data",
-    "pid_file":"/opt/bitnami/consul/tmp/consul.pid",
-    "server":true,
-    "ui":true,
-    "bootstrap_expect":1,
+    "server": true,
+    "datacenter": "dc1",
+    "domain": "consul",
+    "data_dir": "/opt/bitnami/consul/data",
+    "pid_file": "/opt/bitnami/consul/tmp/consul.pid",
+    "ui": true,
+    "bootstrap": true,
+    "bootstrap_expect": 0,
+    "bind_addr": "0.0.0.0",
+    "serf_lan": "0.0.0.0",
     "addresses": {
-        "http":"0.0.0.0"
+        "http": "0.0.0.0",
+        "grpc": "0.0.0.0",
+        "dns": "0.0.0.0"
     },
-    "retry_join": ["127.0.0.1"],
+    "retry_join": [
+        "0.0.0.0"
+    ],
     "ports": {
-        "http":8500,
-        "dns":8600,
-        "serf_lan":8301,
-        "server":8300
+        "server": 8300,
+        "serf_lan": 8301,
+        "http": 8500,
+        "grpc": 8502,
+        "dns": 8600
     },
-    "serf_lan":"0.0.0.0"
+    "log_level": "INFO",
+    "telemetry": {
+        "prometheus_retention_time": "60s",
+        "disable_hostname": true
+    },
+    "enable_central_service_config": true,
+    "enable_local_script_checks": true
 }
