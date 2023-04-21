@@ -7,7 +7,13 @@ The main benifit with this approach is that you can use [any version](https://hu
 For information on how to achieve [clustering](https://www.rabbitmq.com/clustering.html) using peer discovery, refer to the rabbitmq official website.
   - [Cluster Formation and Peer Discovery](https://www.rabbitmq.com/cluster-formation.html)
   - [RabbitMQ Docker-compose Sample: Peer Discovery with Consul](https://github.com/rabbitmq/rabbitmq-server/tree/main/deps/rabbitmq_peer_discovery_consul/examples/compose_consul_haproxy)
-  - [Deploy a Consul datacenter(1 server and 1 client)](https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy)
+  - Consul Deploy Sample
+    - [Deploy a Consul datacenter(1 server and 1 client)](https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy)
+    - [Consul configuration (hcl format)](https://github.com/hashicorp/learn-consul-docker/blob/main/datacenter-deploy-observability/consul/config.hcl)
+  - RabbitMQ Configuration Sample
+    - [rabbitmq.conf.example (Github)](https://github.com/rabbitmq/rabbitmq-server/blob/main/deps/rabbit/docs/rabbitmq.conf.example)
+    - [advanced.config.example (Github)](https://github.com/rabbitmq/rabbitmq-server/blob/main/deps/rabbit/docs/advanced.config.example)
+    - [set_rabbitmq_policy.sh.example (Github)](https://github.com/rabbitmq/rabbitmq-server/blob/main/deps/rabbit/docs/set_rabbitmq_policy.sh.example)
 
 ## Changelog after forked (at 2023/04/10)
 
@@ -44,12 +50,12 @@ For information on how to achieve [clustering](https://www.rabbitmq.com/clusteri
 > docker compose up
 > 
 > # Start long-options with daemon
-> docker compose --env-file ./.env --file ./docker compose.yml up -d
+> docker compose --env-file ./.env --file ./docker-compose.yml up -d
 >
 > # How to scale-up RabbitMQ : --scale rabbit=<NUMBER>
 > docker compose up -d --scale rabbit=7
 > # ... or 
-> docker compose --env-file ./.env --file ./docker compose.yml up -d --scale rabbit=7
+> docker compose --env-file ./.env --file ./docker-compose.yml up -d --scale rabbit=7
 ```
 
 Most things will be how you expect:
@@ -76,7 +82,7 @@ The `.env` file contains environment variables that can be used to change the de
 
 ## HA Proxy
 
-This `docker compose.yml` file comes with the latest version of [HA Proxy](http://www.haproxy.org/), an open source software that provides a high availability load balancer and proxy server.
+This `docker-compose.yml` file comes with the latest version of [HA Proxy](http://www.haproxy.org/), an open source software that provides a high availability load balancer and proxy server.
 
 It should be fairly easy to add a [`port mapping`](https://docs.docker.com/compose/compose-file/#ports) for the individual containers if it is desired to connect to a specific broker node.
 
