@@ -1,0 +1,107 @@
+## Ref.
+##   - https://cbonte.github.io/haproxy-dconv/2.6/intro.html
+##   - https://cbonte.github.io/haproxy-dconv/2.6/configuration.html
+##   - https://cbonte.github.io/haproxy-dconv/2.6/management.html
+
+global
+        log 127.0.0.1   local1
+        maxconn 4096
+ 
+defaults
+        log     global
+        mode    tcp
+        option  tcplog
+        retries 3
+        option  redispatch
+        maxconn 2000
+        timeout connect 10000
+        timeout client  60000
+        timeout server  5000
+ 
+listen  stats
+        bind *:1936
+        mode http
+        stats enable
+        stats hide-version
+        stats realm Cluster_MQ\ Haproxy\ Statistics
+        stats uri /
+
+## management : rabbitmq management port
+listen mgmt
+        bind *:15672
+        mode            tcp
+        balance         roundrobin
+        option          clitcpka
+        server          rabbit rabbit:15672  check inter 5s rise 6 fall 10
+
+# amqp : rabbitmq amqp port
+listen amqp
+        bind *:5672
+        mode            tcp
+        balance         roundrobin
+        option          clitcpka
+        server          rabbit rabbit:5672  check inter 5s rise 6 fall 10
+
+# mqtt : rabbitmq mqtt adapter port
+listen mqtt
+        bind *:1883
+        mode            tcp
+        balance         roundrobin
+        option          clitcpka
+        server          rabbit rabbit:1883  check inter 5s rise 6 fall 10
+
+# stomp : rabbitmq stomp port
+listen stomp
+        bind *:61613
+        mode            tcp
+        balance         roundrobin
+        option          clitcpka
+        server          rabbit rabbit:61613  check inter 5s rise 6 fall 10
+
+# mqtt_websocket : rabbitmq mqtt_websocket adapter port
+listen webmqtt
+        bind *:15675
+        mode            tcp
+        balance         roundrobin
+        option          clitcpka
+        server          rabbit rabbit:15675  check inter 5s rise 6 fall 10
+
+# stomp_websocket : rabbitmq stomp_websocket port
+listen webstomp
+        bind *:15674
+        mode            tcp
+        balance         roundrobin
+        option          clitcpka
+        server          rabbit rabbit:15674  check inter 5s rise 6 fall 10
+
+
+#    #################################################
+#    ### DEV TEST ### ### CONSUL CONNECT TEST ONLY ###
+#    #################################################
+#    frontend rabbit_front_mgmt
+#        mode               tcp
+#        bind               *:15672
+#        option             clitcpka
+#        default_backend    rabbit_back_mgmt
+#    
+#    ## management : rabbitmq management port
+#    #listen mgmt
+#    #        bind *:15672
+#    #        mode            tcp
+#    #        balance         roundrobin
+#    #        option          clitcpka
+#    #        server          rabbit rabbit:15672  check inter 5s rise 6 fall 10
+#    
+#    backend rabbit_back_mgmt
+#        balance  roundrobin
+#        server-template   rabbitmq  1-21  _rabbitmq._tcp.service.consul:15672    resolvers consul  resolve-opts allow-dup-ip resolve-prefer ipv4    check inter 5s rise 2 fall 3
+#    
+#    resolvers consul
+#        nameserver consul consul:8600
+#        accepted_payload_size 8192
+#        hold valid 5s
+#    
+#    #################################################
+#    ### DEV TEST ### ### CONSUL CONNECT TEST ONLY ###
+#    #################################################
+
