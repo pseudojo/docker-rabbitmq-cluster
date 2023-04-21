@@ -2,6 +2,8 @@
 _BASE="$( dirname -- "${BASH_SOURCE[0]}" )"
 . $_BASE/common.sh
 
+# SCRIPT_HOME
+
 if [ "$#" -eq 0 ]; then
   _rabbit=1
 else
@@ -13,5 +15,5 @@ else
   echo "Rabbit Scale: [ ${_rabbit} ]"
 fi
 
-docker compose --env-file ./.env up -d --scale rabbit="${_rabbit}"
+docker compose --env-file $SCRIPT_HOME/.env up -d --scale rabbit="${_rabbit}"
 
